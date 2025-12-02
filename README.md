@@ -1,93 +1,128 @@
-# Blink - Farcaster Tip Links
+# 💸 Blink - Farcaster Tip Links
 
-A minimal full-stack TypeScript app for creating interactive tip links in Farcaster casts. Users can generate tip links that render as interactive frames where others can tip USDC to creators using x402 on Base.
+> Create interactive tip links for Farcaster casts. Let your audience tip you USDC on Base with a single click.
 
-## Features
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
+[![Base](https://img.shields.io/badge/Base-Mainnet-blue)](https://base.org/)
 
-- **Creator Flow**: Connect wallet, set default tip amount, generate tip links
-- **Tipper Flow**: Interactive frame for tipping USDC via x402 protocol
-- **Wallet Integration**: WalletConnect for EVM wallet connection
-- **x402 Payment Flow**: Handles 402 Payment Required responses with automatic payment processing
-- **Base Chain**: Built for Base network with USDC support
+**Blink** is a minimal full-stack application that enables creators to generate shareable tip links. When posted in a Farcaster cast, these links render as interactive frames where followers can tip USDC directly to the creator using the x402 payment protocol on Base.
 
-## Tech Stack
+## ✨ Features
 
-- **Next.js 14** (App Router) with TypeScript
-- **TailwindCSS** for styling
-- **WalletConnect** + **Wagmi** + **Viem** for wallet connection
-- **x402** protocol for payment flows
-- **Base** chain + USDC token
+- 🎯 **Simple Creator Flow** - Connect wallet, set amount, generate link
+- 💰 **One-Click Tipping** - Interactive frames for seamless USDC tips
+- 🔗 **Farcaster Native** - Tip links render beautifully in casts
+- 🔐 **WalletConnect Integration** - Support for all major wallets
+- ⚡ **x402 Protocol** - Modern payment flow with 402 Payment Required
+- 🌐 **Base Network** - Built for Base mainnet with USDC support
+- 🎨 **Clean UI** - Modern, responsive design with TailwindCSS
 
-## Setup
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm/yarn
-- WalletConnect Project ID (get from [WalletConnect Cloud](https://cloud.walletconnect.com))
+- **Node.js** 18+ and npm/yarn
+- **WalletConnect Project ID** - Get one free at [WalletConnect Cloud](https://cloud.walletconnect.com)
+- **Base Network Wallet** - MetaMask or any EVM wallet with Base network
 
 ### Installation
 
-1. Install dependencies:
-```bash
-npm install
+1. **Clone and install**:
+   ```bash
+   git clone <your-repo-url>
+   cd blink
+   npm install
+   ```
+
+2. **Configure environment variables**:
+   
+   Create a `.env.local` file in the root directory:
+   ```env
+   # Base Chain Configuration
+   NEXT_PUBLIC_BASE_CHAIN_ID=8453
+   NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
+   
+   # USDC Token Address (Base Mainnet)
+   NEXT_PUBLIC_USDC_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+   
+   # WalletConnect (Required for wallet connections)
+   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
+   
+   # Base URL (for localhost, use http://localhost:3000)
+   # For production, set to your deployed URL
+   NEXT_PUBLIC_BASE_URL=http://localhost:3000
+   ```
+
+3. **Start development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Open** [http://localhost:3000](http://localhost:3000) in your browser
+
+## 📖 How It Works
+
+### For Creators
+
+1. **Visit** the app and connect your wallet (must be on Base network)
+2. **Enter** your desired tip amount in USDC
+3. **Generate** a tip link
+4. **Share** the link in your Farcaster cast
+5. The link automatically renders as an interactive frame
+
+### For Tippers
+
+1. **Click** a tip link in a Farcaster cast
+2. **Connect** your wallet (auto-prompted to switch to Base if needed)
+3. **Review** the tip amount
+4. **Click** "Tip X USDC" and approve the transaction
+5. **Confirm** success with transaction hash
+
+## 🏗️ Tech Stack
+
+| Technology | Purpose |
+|------------|---------|
+| **Next.js 14** | React framework with App Router |
+| **TypeScript** | Type-safe development |
+| **TailwindCSS** | Utility-first styling |
+| **Wagmi** | React hooks for Ethereum |
+| **Viem** | TypeScript Ethereum library |
+| **WalletConnect** | Multi-wallet connection |
+| **x402 Protocol** | HTTP 402 Payment Required flow |
+| **Base** | Layer 2 blockchain network |
+
+## 📁 Project Structure
+
+```
+blink/
+├── app/
+│   ├── api/                    # API routes
+│   │   ├── create-tip-link/    # Generate new tip links
+│   │   ├── tip-metadata/       # Fetch tip configuration
+│   │   └── tip-start/          # Initiate payment flow
+│   ├── frame/                  # Tipper interface
+│   │   └── page.tsx
+│   ├── page.tsx                # Creator interface
+│   ├── layout.tsx              # Root layout
+│   └── globals.css             # Global styles
+├── components/
+│   └── WalletProvider.tsx      # Wallet context
+├── lib/
+│   ├── storage.ts              # In-memory tip storage
+│   ├── wallet.ts               # Wallet configuration
+│   ├── x402.ts                 # Server-side x402 logic
+│   └── x402-client.ts          # Client-side payment handler
+└── [config files]
 ```
 
-2. Create a `.env.local` file in the root directory:
-```bash
-cp .env.local.example .env.local
-```
-
-3. Configure environment variables in `.env.local`:
-```env
-# Base chain configuration
-NEXT_PUBLIC_BASE_CHAIN_ID=8453
-NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
-
-# USDC token address on Base
-NEXT_PUBLIC_USDC_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-
-# WalletConnect Project ID (required)
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
-
-# Base URL for generating tip links
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
-```
-
-4. Run the development server:
-```bash
-npm run dev
-```
-
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Usage
-
-### Creator Flow
-
-1. Visit the root page (`/`)
-2. Click "Connect Wallet" and connect your EVM wallet
-3. Enter a default tip amount in USDC
-4. Click "Generate Tip Link"
-5. Copy the generated tip link URL
-6. Paste the URL into a Farcaster cast to create an interactive tip frame
-
-### Tipper Flow
-
-1. Click on a tip link in a Farcaster cast (or visit `/frame?tipId=...`)
-2. The frame will display the tip amount
-3. Connect your wallet
-4. Click "Tip X USDC" button
-5. Approve the transaction in your wallet
-6. Wait for confirmation
-7. See success message with transaction hash
-
-## API Endpoints
+## 🔌 API Reference
 
 ### `POST /api/create-tip-link`
 
 Creates a new tip link configuration.
 
-**Request Body:**
+**Request:**
 ```json
 {
   "creatorAddress": "0x...",
@@ -98,19 +133,19 @@ Creates a new tip link configuration.
 **Response:**
 ```json
 {
-  "tipId": "tip_...",
-  "tipUrl": "http://localhost:3000/frame?tipId=..."
+  "tipId": "tip_1234567890_abc123",
+  "tipUrl": "https://your-app.com/frame?tipId=tip_1234567890_abc123"
 }
 ```
 
 ### `GET /api/tip-metadata?tipId=...`
 
-Fetches metadata for a tip link.
+Retrieves tip link metadata.
 
 **Response:**
 ```json
 {
-  "tipId": "tip_...",
+  "tipId": "tip_1234567890_abc123",
   "creatorAddress": "0x...",
   "defaultAmount": "1.0"
 }
@@ -118,12 +153,12 @@ Fetches metadata for a tip link.
 
 ### `POST /api/tip-start`
 
-Initiates a tip payment flow using x402.
+Initiates the x402 payment flow.
 
-**Request Body:**
+**Request:**
 ```json
 {
-  "tipId": "tip_...",
+  "tipId": "tip_1234567890_abc123",
   "tipperAddress": "0x...",
   "amount": "1.0"
 }
@@ -152,64 +187,25 @@ Initiates a tip payment flow using x402.
 }
 ```
 
-## x402 Integration
+## 🔄 x402 Payment Flow
 
-The app implements the x402 protocol for handling payments:
+Blink implements the x402 protocol for seamless payments:
 
-1. **Initial Request**: Client calls `/api/tip-start` without payment
-2. **402 Response**: Server returns 402 with payment requirements
-3. **Payment Processing**: Client uses x402 client to process USDC transfer
-4. **Retry Request**: Client retries `/api/tip-start` with transaction hash
-5. **Success**: Server verifies payment and returns success response
+1. **Initial Request** → Client requests tip without payment
+2. **402 Response** → Server returns payment requirements
+3. **Payment Processing** → Client executes USDC transfer on Base
+4. **Retry Request** → Client retries with transaction hash
+5. **Success** → Server verifies and confirms payment
 
-The x402 integration is implemented in:
-- `lib/x402.ts` - Server-side payment flow logic
-- `lib/x402-client.ts` - Client-side payment processing
+This flow ensures payments are atomic and verifiable on-chain.
 
-## Project Structure
+## 🚢 Deployment
 
-```
-blink/
-├── app/
-│   ├── api/
-│   │   ├── create-tip-link/route.ts    # Create tip link endpoint
-│   │   ├── tip-metadata/route.ts       # Get tip metadata endpoint
-│   │   └── tip-start/route.ts          # Start tip payment endpoint
-│   ├── frame/
-│   │   └── page.tsx                    # Tipper frame page
-│   ├── globals.css                     # Global styles
-│   ├── layout.tsx                      # Root layout with WalletProvider
-│   └── page.tsx                        # Creator page
-├── components/
-│   └── WalletProvider.tsx              # Wallet context provider
-├── lib/
-│   ├── storage.ts                      # In-memory tip storage
-│   ├── wallet.ts                       # Wallet configuration
-│   ├── x402.ts                         # x402 server-side logic
-│   └── x402-client.ts                  # x402 client-side payment handler
-├── package.json
-├── tsconfig.json
-└── tailwind.config.ts
-```
-
-## Storage
-
-Currently uses in-memory storage for tip configurations. In production, this should be replaced with a database (e.g., PostgreSQL, MongoDB, or Supabase).
-
-## Development
-
-- Run dev server: `npm run dev`
-- Build for production: `npm run build`
-- Start production server: `npm start`
-- Lint: `npm run lint`
-
-## Deployment
+> **⚠️ Important**: Localhost URLs won't work in Farcaster casts. You must deploy to a public URL.
 
 ### Deploy to Vercel (Recommended)
 
-Vercel is the easiest way to deploy Next.js apps:
-
-1. **Install Vercel CLI** (optional, or use web interface):
+1. **Install Vercel CLI**:
    ```bash
    npm i -g vercel
    ```
@@ -218,67 +214,107 @@ Vercel is the easiest way to deploy Next.js apps:
    ```bash
    vercel
    ```
-   Or push to GitHub and import your repo at [vercel.com](https://vercel.com)
 
 3. **Set Environment Variables** in Vercel Dashboard:
-   - Go to your project → Settings → Environment Variables
-   - Add all variables from `.env.local`:
-     ```
-     NEXT_PUBLIC_BASE_CHAIN_ID=8453
-     NEXT_PUBLIC_BASE_RPC_URL=https://mainnet.base.org
-     NEXT_PUBLIC_USDC_ADDRESS=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
-     NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
-     NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
-     ```
-   - **Important**: Set `NEXT_PUBLIC_BASE_URL` to your Vercel deployment URL (e.g., `https://blink.vercel.app`)
+   - Go to Project → Settings → Environment Variables
+   - Add all variables from your `.env.local`
+   - **Critical**: Set `NEXT_PUBLIC_BASE_URL` to your Vercel URL
 
-4. **Redeploy** after adding environment variables
+4. **Redeploy**:
+   ```bash
+   vercel --prod
+   ```
 
-### Deploy to Other Platforms
+📚 **Detailed deployment guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
 
-#### Netlify
-1. Connect your GitHub repo to Netlify
-2. Build command: `npm run build`
-3. Publish directory: `.next`
-4. Add environment variables in Netlify dashboard
-5. Set `NEXT_PUBLIC_BASE_URL` to your Netlify URL
+### Other Platforms
 
-#### Railway
-1. Connect your GitHub repo to Railway
-2. Railway auto-detects Next.js
-3. Add environment variables in Railway dashboard
-4. Set `NEXT_PUBLIC_BASE_URL` to your Railway URL
+- **Netlify**: Connect repo, set build command to `npm run build`, add env vars
+- **Railway**: Auto-detects Next.js, add env vars in dashboard
+- **Self-hosted**: Build with `npm run build`, start with `npm start`, configure reverse proxy
 
-#### Self-Hosted
-1. Build the app: `npm run build`
-2. Start production server: `npm start`
-3. Set `NEXT_PUBLIC_BASE_URL` to your domain
-4. Use a reverse proxy (nginx) for HTTPS
+## 🛠️ Development
 
-### Post-Deployment Checklist
+```bash
+# Development server
+npm run dev
 
-- [ ] Set `NEXT_PUBLIC_BASE_URL` to your production URL
-- [ ] Verify all environment variables are set
-- [ ] Test wallet connection on production
-- [ ] Generate a tip link and verify it works
-- [ ] Test the tip flow end-to-end
-- [ ] Share a tip link in a Farcaster cast to test embedding
+# Production build
+npm run build
 
-### Important Notes
+# Start production server
+npm start
 
-- **Localhost URLs won't work** in Farcaster casts - you must deploy to a public URL
-- The app uses in-memory storage, so tip configs are lost on server restart
-- For production, consider adding a database (PostgreSQL, MongoDB, or Supabase)
-- Make sure your deployment URL is accessible from the public internet
+# Lint code
+npm run lint
+```
 
-## Notes
+## ⚙️ Configuration
 
-- The app is configured for Base mainnet. To use testnet, update the chain ID and USDC address in `.env.local`
-- USDC on Base has 6 decimals
-- WalletConnect Project ID is required for wallet connections
-- Tip configurations are stored in memory and will be lost on server restart
-- **For Farcaster frames to work, the app must be deployed to a public URL (not localhost)**
+### Environment Variables
 
-## License
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_BASE_CHAIN_ID` | Base network chain ID | No | `8453` |
+| `NEXT_PUBLIC_BASE_RPC_URL` | Base RPC endpoint | No | `https://mainnet.base.org` |
+| `NEXT_PUBLIC_USDC_ADDRESS` | USDC token contract | No | Base mainnet address |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | WalletConnect project ID | Yes* | - |
+| `NEXT_PUBLIC_BASE_URL` | App base URL | No | Auto-detected |
 
-See LICENSE file for details.
+*WalletConnect is optional - browser wallets (MetaMask) work without it
+
+### Network Configuration
+
+The app is configured for **Base Mainnet** by default. To use Base Sepolia testnet:
+
+```env
+NEXT_PUBLIC_BASE_CHAIN_ID=84532
+NEXT_PUBLIC_BASE_RPC_URL=https://sepolia.base.org
+NEXT_PUBLIC_USDC_ADDRESS=<testnet_usdc_address>
+```
+
+## 📝 Important Notes
+
+- **Storage**: Currently uses in-memory storage. Tip configs are lost on server restart. For production, consider adding a database (PostgreSQL, MongoDB, Supabase).
+- **USDC Decimals**: USDC on Base uses 6 decimals (not 18 like ETH).
+- **Network Switching**: The app automatically prompts users to switch to Base if they're on a different network.
+- **HTTPS Required**: Production deployments must use HTTPS for WalletConnect to work.
+- **Farcaster Frames**: Tip links must be deployed to a public URL to work in Farcaster casts.
+
+## 🐛 Troubleshooting
+
+### Wallet Connection Issues
+
+- **Error: "Unauthorized: invalid key"** → Check `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set correctly
+- **Wallet not connecting** → Ensure you're using HTTPS in production
+- **Wrong network** → App will prompt to switch to Base automatically
+
+### Tip Link Issues
+
+- **Localhost URL generated** → Set `NEXT_PUBLIC_BASE_URL` in production
+- **Frame not rendering** → Ensure URL is publicly accessible and uses HTTPS
+- **Tip link not found** → Tip configs are in-memory; may be lost on restart
+
+### Build Errors
+
+- **Module resolution errors** → Run `npm install` to ensure all dependencies are installed
+- **Type errors** → Check TypeScript version matches project requirements
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+See [LICENSE](./LICENSE) file for details.
+
+## 🔗 Links
+
+- [Base Network](https://base.org)
+- [Farcaster](https://farcaster.xyz)
+- [WalletConnect](https://walletconnect.com)
+- [Next.js Documentation](https://nextjs.org/docs)
+
+---
+
+**Made with ❤️ for the Farcaster community**
