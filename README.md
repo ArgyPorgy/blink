@@ -5,8 +5,17 @@
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![Base](https://img.shields.io/badge/Base-Mainnet-blue)](https://base.org/)
+[![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
 **Blink** is a minimal full-stack application that enables creators to generate shareable tip links. When posted in a Farcaster cast, these links render as interactive frames where followers can tip USDC directly to the creator using the x402 payment protocol on Base.
+
+## 🎯 Why Blink?
+
+- **Zero Fees** - Built on Base for low transaction costs
+- **Instant Payments** - Real-time USDC transfers on Base L2
+- **Farcaster Native** - Seamlessly integrates with Farcaster casts
+- **No Middleman** - Direct creator-to-supporter payments
+- **Open Source** - Fully transparent and customizable
 
 ## ✨ Features
 
@@ -78,6 +87,31 @@
 3. **Review** the tip amount
 4. **Click** "Tip X USDC" and approve the transaction
 5. **Confirm** success with transaction hash
+
+### Example Flow
+
+```
+Creator                    Tipper                    Blockchain
+  │                          │                           │
+  ├─ Generate Tip Link       │                           │
+  ├─ Share in Cast ──────────>                          │
+  │                          │                           │
+  │                    Click Link                        │
+  │                    Connect Wallet                    │
+  │                    Review Amount                     │
+  │                    Approve TX ──────────────────────>
+  │                          │                    Process Payment
+  │                    Success! <─────────────────────────
+  │                          │                           │
+```
+
+## 🎬 Demo
+
+> **Note**: Screenshots and demo video coming soon!
+
+- Creator interface for generating tip links
+- Interactive frame rendering in Farcaster
+- Wallet connection and payment flow
 
 ## 🏗️ Tech Stack
 
@@ -189,15 +223,23 @@ Initiates the x402 payment flow.
 
 ## 🔄 x402 Payment Flow
 
-Blink implements the x402 protocol for seamless payments:
+Blink implements the [x402 protocol](https://x402.dev) for seamless, on-chain payments. The x402 protocol uses HTTP 402 Payment Required status codes to create a standardized payment flow.
+
+### How It Works
 
 1. **Initial Request** → Client requests tip without payment
-2. **402 Response** → Server returns payment requirements
-3. **Payment Processing** → Client executes USDC transfer on Base
-4. **Retry Request** → Client retries with transaction hash
-5. **Success** → Server verifies and confirms payment
+2. **402 Response** → Server returns payment requirements (amount, token, recipient, chain)
+3. **Payment Processing** → Client executes USDC transfer on Base using wagmi/viem
+4. **Retry Request** → Client retries with transaction hash for verification
+5. **Success** → Server verifies payment and returns success response
 
-This flow ensures payments are atomic and verifiable on-chain.
+### Benefits
+
+- ✅ **Standardized** - Uses HTTP 402 status code (Payment Required)
+- ✅ **On-Chain** - All payments are verifiable on Base blockchain
+- ✅ **Atomic** - Payment and verification happen in one flow
+- ✅ **Secure** - No off-chain payment processing required
+- ✅ **Transparent** - Transaction hash provided for every payment
 
 ## 🚢 Deployment
 
@@ -275,46 +317,155 @@ NEXT_PUBLIC_USDC_ADDRESS=<testnet_usdc_address>
 
 ## 📝 Important Notes
 
-- **Storage**: Currently uses in-memory storage. Tip configs are lost on server restart. For production, consider adding a database (PostgreSQL, MongoDB, Supabase).
-- **USDC Decimals**: USDC on Base uses 6 decimals (not 18 like ETH).
-- **Network Switching**: The app automatically prompts users to switch to Base if they're on a different network.
-- **HTTPS Required**: Production deployments must use HTTPS for WalletConnect to work.
-- **Farcaster Frames**: Tip links must be deployed to a public URL to work in Farcaster casts.
+### Storage
+- Currently uses **in-memory storage**. Tip configs are lost on server restart.
+- For production, consider adding a database:
+  - **PostgreSQL** - Recommended for production
+  - **MongoDB** - Good for flexible schemas
+  - **Supabase** - Easy setup with built-in auth
+  - **Redis** - Fast key-value storage
+
+### Technical Details
+- **USDC Decimals**: USDC on Base uses **6 decimals** (not 18 like ETH)
+- **Network Switching**: The app automatically prompts users to switch to Base if they're on a different network
+- **HTTPS Required**: Production deployments must use HTTPS for WalletConnect to work
+- **Farcaster Frames**: Tip links must be deployed to a public URL to work in Farcaster casts
+
+### Security Considerations
+- All payments are processed on-chain and are verifiable
+- No private keys are stored or transmitted
+- Wallet connections use WalletConnect's secure protocol
+- Transaction signing happens in the user's wallet
 
 ## 🐛 Troubleshooting
 
 ### Wallet Connection Issues
 
-- **Error: "Unauthorized: invalid key"** → Check `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set correctly
-- **Wallet not connecting** → Ensure you're using HTTPS in production
-- **Wrong network** → App will prompt to switch to Base automatically
+| Problem | Solution |
+|---------|----------|
+| **Error: "Unauthorized: invalid key"** | Check `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` is set correctly in your environment variables |
+| **Wallet not connecting** | Ensure you're using HTTPS in production (WalletConnect requires HTTPS) |
+| **Wrong network** | App will automatically prompt to switch to Base - click the switch button |
+| **Hydration errors** | Clear browser cache and restart the dev server |
+| **"Chain not configured" error** | Make sure Base network is added to your wallet |
 
 ### Tip Link Issues
 
-- **Localhost URL generated** → Set `NEXT_PUBLIC_BASE_URL` in production
-- **Frame not rendering** → Ensure URL is publicly accessible and uses HTTPS
-- **Tip link not found** → Tip configs are in-memory; may be lost on restart
+| Problem | Solution |
+|---------|----------|
+| **Localhost URL generated** | Set `NEXT_PUBLIC_BASE_URL` to your production URL in environment variables |
+| **Frame not rendering in Farcaster** | Ensure URL is publicly accessible, uses HTTPS, and is deployed (not localhost) |
+| **Tip link not found** | Tip configs are in-memory; may be lost on server restart. Consider adding a database |
+| **404 on tip link** | Verify the tip link was generated after the last server restart |
 
 ### Build Errors
 
-- **Module resolution errors** → Run `npm install` to ensure all dependencies are installed
-- **Type errors** → Check TypeScript version matches project requirements
+| Problem | Solution |
+|---------|----------|
+| **Module resolution errors** | Run `npm install` to ensure all dependencies are installed |
+| **Type errors** | Check TypeScript version matches project requirements (5.3+) |
+| **Porto module errors** | Already handled in `next.config.js` - should not occur |
+| **Webpack errors** | Clear `.next` folder and rebuild: `rm -rf .next && npm run build` |
+
+### Payment Issues
+
+| Problem | Solution |
+|---------|----------|
+| **Transaction fails** | Ensure you have enough USDC and ETH for gas on Base |
+| **Payment not verified** | Check that transaction was confirmed on Base network |
+| **402 response not handled** | Ensure wallet is connected and on Base network |
+
+## ❓ FAQ
+
+### Can I use this on other networks besides Base?
+
+Currently, Blink is configured for Base mainnet. You can modify the chain configuration in `lib/wallet.ts` and update environment variables to support other networks, but USDC addresses will differ.
+
+### Do I need a WalletConnect Project ID?
+
+No! WalletConnect is optional. The app works with browser wallets (MetaMask, etc.) without a WalletConnect Project ID. However, WalletConnect enables mobile wallet support.
+
+### How do I add persistent storage?
+
+Replace the in-memory storage in `lib/storage.ts` with your preferred database. See the [Storage](#storage) section for recommendations.
+
+### Can I customize the tip amounts?
+
+Yes! The default amount is set by the creator when generating the link. You can modify the UI to allow custom amounts in the frame page.
+
+### Is this production-ready?
+
+The core functionality is solid, but for production use, consider:
+- Adding a database for persistent storage
+- Implementing rate limiting
+- Adding error tracking (Sentry, etc.)
+- Setting up monitoring and alerts
+
+### How much does it cost to run?
+
+- **Hosting**: Free on Vercel (hobby plan) or similar platforms
+- **Transactions**: Base network fees are minimal (~$0.01-0.05 per transaction)
+- **WalletConnect**: Free for basic usage
+
+## 🗺️ Roadmap
+
+Future improvements planned:
+
+- [ ] Database integration for persistent storage
+- [ ] Custom tip amount support in frames
+- [ ] Tip history and analytics
+- [ ] Multi-token support (beyond USDC)
+- [ ] Creator dashboard
+- [ ] Email notifications
+- [ ] Farcaster frame metadata optimization
+- [ ] Rate limiting and security enhancements
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Here's how you can help:
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Guidelines
+
+- Follow TypeScript best practices
+- Add comments for complex logic
+- Update README for new features
+- Test wallet connections on multiple browsers
+- Ensure mobile responsiveness
 
 ## 📄 License
 
-See [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
-## 🔗 Links
+## 🔗 Resources & Links
 
-- [Base Network](https://base.org)
-- [Farcaster](https://farcaster.xyz)
-- [WalletConnect](https://walletconnect.com)
-- [Next.js Documentation](https://nextjs.org/docs)
+### Documentation
+- [Base Network](https://base.org) - Base L2 documentation
+- [Farcaster](https://farcaster.xyz) - Farcaster protocol docs
+- [WalletConnect](https://walletconnect.com) - WalletConnect docs
+- [Next.js Documentation](https://nextjs.org/docs) - Next.js guide
+- [Wagmi Documentation](https://wagmi.sh) - Wagmi React hooks
+- [x402 Protocol](https://x402.dev) - x402 payment protocol
+
+### Community
+- [Base Discord](https://discord.gg/base)
+- [Farcaster Discord](https://discord.gg/farcaster)
+- [Base Twitter](https://twitter.com/base)
+
+## 🙏 Acknowledgments
+
+- Built for the Farcaster community
+- Powered by Base network
+- Uses x402 protocol for payments
+- Inspired by the creator economy
 
 ---
 
 **Made with ❤️ for the Farcaster community**
+
+*If you find this project useful, please consider giving it a ⭐ on GitHub!*

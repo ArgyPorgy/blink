@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
-  
+
   "dependencies": {
     "@tanstack/react-query": "^5.28.0",
     "@web3modal/wagmi": "^4.0.0",
@@ -19,6 +19,7 @@
     "viem": "^2.7.0",
     "wagmi": "^2.5.0"
   },
+  
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/react": "^18.3.0",
