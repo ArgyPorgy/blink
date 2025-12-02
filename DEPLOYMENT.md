@@ -92,6 +92,7 @@ Farcaster frames require a publicly accessible URL. Localhost URLs (`http://loca
 
 ### Netlify
 
+
 1. **Connect Repository**:
    - Go to [netlify.com](https://netlify.com)
    - Click "Add new site" → "Import an existing project"

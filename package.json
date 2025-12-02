@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  
   "dependencies": {
     "@tanstack/react-query": "^5.28.0",
     "@web3modal/wagmi": "^4.0.0",
